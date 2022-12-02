@@ -37,10 +37,19 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     _init();
+    _initsqlite3();
   }
 
   Future<void> _init() async {
     loader = WasmLoader(path: 'assets/wasm/release.wasm');
+    final isLoaded = await loader.initialized();
+    if (isLoaded) {
+      setState(() {});
+    }
+  }
+
+  Future<void> _initsqlite3() async {
+    loader = WasmLoader(path: 'web/sqlite-wasm-3400000/jswasm/sqlite3.wasm');
     final isLoaded = await loader.initialized();
     if (isLoaded) {
       setState(() {});
