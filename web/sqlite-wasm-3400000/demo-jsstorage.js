@@ -78,6 +78,7 @@
         });
         console.log("saveSql =",saveSql,theStore);
         log("DB (re)initialized.");
+        log("DB が (再) 初期化されました。");
       }catch(e){
         error(e.message);
       }
@@ -102,8 +103,10 @@
     log("Storage backend:",db.filename);
     if(0===db.selectValue('select count(*) from sqlite_master')){
       log("DB is empty. Use the init button to populate it.");
+      log("DB が空です。(Re)init db ボタンを使用して入力します。");
     }else{
       log("DB contains data from a previous session. Use the Clear Ctorage button to delete it.");
+      log("DBには、前のセッションのデータが含まれています。[Clear storage]ボタンを使用して削除します.");
       btnSelect.click();
     }
   };

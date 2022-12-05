@@ -10,6 +10,8 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.2
   wasm_interop: ^2.0.1
+  sqlite3: ^1.9.1
+  http: ^0.13.5
   
 dev_dependencies:
   flutter_test:

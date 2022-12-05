@@ -12,6 +12,9 @@
 
   This file contains bootstrapping code used by various test scripts
   which live in this file's directory.
+
+  このファイルには、さまざまなテストスクリプトで使用されるブートストラップコードが含まれています
+  このファイルのディレクトリにあります。
 */
 'use strict';
 (function(self){
