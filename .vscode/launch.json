@@ -56,6 +56,12 @@
             "name": "http://127.0.0.1:3000/web/sqlite-wasm-3400000/demo-jsstorage.html",
             "request": "launch",
             "url": "http://127.0.0.1:3000/web/sqlite-wasm-3400000/demo-jsstorage.html"
+        },
+        {
+            "type": "msedge",
+            "name": "http://127.0.0.1:3000/web/sqlite-wasm-3400000/demo-1234.html",
+            "request": "launch",
+            "url": "http://127.0.0.1:3000/web/sqlite-wasm-3400000/demo-1234.html"
         }
     ]
 }

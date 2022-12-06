@@ -8,9 +8,26 @@
   // Use :memory: storage
   const db = new DB();
 
+//データベースに接続
+//filepath = "test2.sqlite"
+//conn = sqlite3.connect(filepath) 
+//filepathと同名のファイルがなければ，ファイルが作成されます
+
+//テーブルを作成
+//cur = conn.cursor()
+db.exec("DROP TABLE IF EXISTS items")
+
+db.exec("CREATE TABLE items(item_id INTEGER PRIMARY KEY,name TEXT UNIQUE,price INTEGER)")
+//db.commit()
+
+
+
+
   db.exec("CREATE TABLE IF NOT EXISTS users(id INTEGER, name TEXT)");
 
   const stmt = db.prepare("insert into users values(?, ?)");
+  stmt.bind([1, "Alice"]).stepReset();
+  stmt.bind([2, "Bob"]).stepReset();
   stmt.bind([1, "Alice"]).stepReset();
   stmt.bind([2, "Bob"]).stepReset();
   stmt.finalize();
@@ -24,6 +41,7 @@
 
   // Logs { id, name }[]
   console.log(resultRows);
+  //log(resultRows);
 })();
 //sqlite3InitModule()を呼ぶと、jswasm/sqlite3.wasmが読み込まれて、
 //JSから操作できるようになる。
