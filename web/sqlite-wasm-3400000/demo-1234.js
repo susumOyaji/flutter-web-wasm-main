@@ -57,8 +57,7 @@
     */
     try {
       log("5...Create a table...");
-      //db.exec("CREATE TABLE IF NOT EXISTS t(a,b)");
-      db.exec();
+      db.exec("CREATE TABLE IF NOT EXISTS t(a,b)");
       //Equivalent:
       db.exec({
         sql:"CREATE TABLE IF NOT EXISTS t(a,b)"
@@ -70,12 +69,13 @@
       // with a semicolon).
 
       log("6...Insert some data using exec()...");
+      log("exec() を使用してデータを挿入します。");
       let i;
       for( i = 20; i <= 25; ++i ){
         db.exec({
           sql: "insert into t(a,b) values (?,?)",
           // bind by parameter index...
-          bind: [i, i*2]
+          bind: [i, i*4]
         });
         db.exec({
           sql: "insert into t(a,b) values ($a,$b)",
@@ -85,6 +85,7 @@
       }    
 
       log("7...Insert using a prepared statement...");
+      log("準備されたステートメントを使用して挿入します...");
       let q = db.prepare([
         // SQL may be a string or array of strings
         // (concatenated w/o separators).
@@ -231,8 +232,11 @@
 
     log("27...That's all, folks!");
 
+ 
+
     /**
        Some of the features of the OO API not demonstrated above...
+       OO APIの機能のいくつかは上記で示されていません...
 
        - get change count (total or statement-local, 32- or 64-bit)
        - get a DB's file name
