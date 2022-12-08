@@ -17,9 +17,12 @@ function _insert(id,name,price) {
 
 }
 
-function _delete(id) {
-  const stmt = db.prepare("delete into fruits values(?, ?, ?)");
-  
+function _delete(name) {
+  //const stmt = db.prepare("delete into fruits values(?, ?, ?)");
+  db.exec({
+    sql:"DELETE FROM fruits WHERE name = 'name' SELECT name FROM fruits",
+
+  })
 }
 
 
