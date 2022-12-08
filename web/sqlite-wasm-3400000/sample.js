@@ -6,6 +6,10 @@ function _insert(id,name,price) {
   const stmt = db.prepare("insert into fruits values(?, ?, ?)");
   stmt.bind([id, name, price]).stepReset();
 
+  db.exec({
+    sql: "INSERT INTO fruits VALUES(id,name,price)",//実行するSQL
+  })
+
   const resultRows = [];
   db.exec({
     sql: "SELECT * FROM fruits",//実行するSQL
@@ -13,14 +17,13 @@ function _insert(id,name,price) {
     //'array'(デフォルト), 'object', 'stmt'現在のStmtをコールバックに渡します
     resultRows,//returnValue:
   });
-  log("_insert...Result rows:", JSON.stringify(resultRows, undefined, 2)); 
+  //log("_insert...Result rows:", JSON.stringify(resultRows, undefined, 2)); 
 
 }
 
 function _delete(name) {
-  //const stmt = db.prepare("delete into fruits values(?, ?, ?)");
   db.exec({
-    sql:"DELETE FROM fruits WHERE name = 'name' SELECT name FROM fruits",
+    sql: "DELETE FROM fruits WHERE name = "+ name + " SELECT name FROM fruits",
 
   })
 }
@@ -87,7 +90,7 @@ function _delete(name) {
         });
       
      
-      _insert(9,'lemon',1000);
+      _insert(10,'lemon',1000);
       /*  
       exec()
         指定された文字列内のすべての SQL ステートメントを実行します。 引数は次のいずれかである必要があります。
