@@ -57,6 +57,8 @@
     const db = new oo.JsStorageDb( dbStorage );
     // Or: oo.DB(dbStorage, 'c', 'kvvfs')
     log("db.storageSize():",db.storageSize());
+
+    
     document.querySelector('#btn-clear-storage').addEventListener('click',function(){
       const sz = db.clearStorage();
       log("kvvfs",db.filename+"Storage cleared:",sz,"entries.");

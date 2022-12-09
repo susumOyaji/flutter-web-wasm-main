@@ -2,34 +2,68 @@
 
 var db;
 
-function _insert(id,name,price) {
-  const stmt = db.prepare("insert into fruits values(?, ?, ?)");
-  stmt.bind([id, name, price]).stepReset();
 
-  db.exec({
-    sql: "INSERT INTO fruits VALUES(id,name,price)",//実行するSQL
-  })
-
+function _insert(_id,_name,_price) {
   const resultRows = [];
+  //const stmt = db.prepare("insert into fruits values(?, ?, ?)");
+  //stmt.bind([_id, _name, _price]).stepReset();
+  db.exec({
+    sql: "insert into fruits(id,name,price) values ($a,$b,$c)",
+    // bind by parameter name...
+    bind: {$a: _id , $b: _name ,$c:_price}
+  });
+  
   db.exec({
     sql: "SELECT * FROM fruits",//実行するSQL
     rowMode: "object",//コールバックの最初の引数のタイプを指定します,
     //'array'(デフォルト), 'object', 'stmt'現在のStmtをコールバックに渡します
     resultRows,//returnValue:
   });
-  //log("_insert...Result rows:", JSON.stringify(resultRows, undefined, 2)); 
-
+  return resultRows;
 }
 
-function _delete(name) {
+
+function _delete(id) {
+  const resultRows=[];
+  const stmt = db.prepare("delete from fruits where id =?");
+  stmt.bind([id]).stepReset();
+
+  //db.exec({
+  //  sql: "DELETE FROM fruits WHERE id = "+ id ,
+  //  rowMode: "object",
+    //resultRows,
+  //})
+
   db.exec({
-    sql: "DELETE FROM fruits WHERE name = "+ name + " SELECT name FROM fruits",
-
-  })
+    sql: "SELECT * FROM fruits",//実行するSQL
+    rowMode: "object",
+    resultRows,//returnValue:
+  });
+  return resultRows;
 }
+
+//複数のカラムを対象に並び替えを行う
+//address カラムの値でソートした上で address カラムの値が同じデータに対して old カラムの値でソートします。
+//ORDER BY句の後に記述する順番に気を付けて下さい。
+//SELECT * FROM fruits order by address asc, old asc;
+
+function _sort(asc){
+ const resultRows=[];
+ db.exec({
+    sql: "SELECT * FROM fruits order by id "+asc ,//昇順でソートしてみます。
+    rowMode: "object",
+    resultRows,
+  });
+  return resultRows;
+}
+
+
+
+
 
 
 (function () {
+  const T = self.SqliteTestUtil;
     let logHtml;
     if(self.window === self /* UI thread */){
         console.log("Running demo from main UI thread.");
@@ -54,130 +88,135 @@ function _delete(name) {
 
 
     const demo1 = function(sqlite3){
-        const capi = sqlite3.capi/*C-style API*/,
-            oo = sqlite3.oo1/*high-level OO API*/;
-        log("3...sqlite3 version",capi.sqlite3_libversion(), capi.sqlite3_sourceid());
-        db = new oo.DB("/mydb.sqlite3",'ct');
-        log("4...transient db =",db.filename);
-        /**
-         Never(!) rely on garbage collection to clean up DBs and
-        (especially) prepared statements. Always wrap their lifetimes
-        in a try/finally construct, as demonstrated below. By and
-        large, client code can entirely avoid lifetime-related
-        complications of prepared statement objects by using the
-        DB.exec() method for SQL execution.
-        */ 
+      const capi = sqlite3.capi/*C-style API*/,
+          oo = sqlite3.oo1/*high-level OO API*/;
+      log("3...sqlite3 version",capi.sqlite3_libversion(), capi.sqlite3_sourceid());
+      db = new oo.DB("/mydb.sqlite3",'ct');
+      log("4...transient db =",db.filename);
+      /**
+       Never(!) rely on garbage collection to clean up DBs and
+      (especially) prepared statements. Always wrap their lifetimes
+      in a try/finally construct, as demonstrated below. By and
+      large, client code can entirely avoid lifetime-related
+      complications of prepared statement objects by using the
+      DB.exec() method for SQL execution.
+      */ 
 
 
-        log("5...Create a table...");
-        db.exec("CREATE TABLE IF NOT EXISTS fruits(id INTEGER, name TEXT, price INTEGER)");
+      log("5...Create a table...");
+      db.exec("CREATE TABLE IF NOT EXISTS fruits(id INTEGER, name TEXT, price INTEGER)");
 
-        const stmt = db.prepare("insert into fruits values(?, ?, ?)");
-        stmt.bind([1, 'apple', 150]).stepReset();
-        stmt.bind([2, 'orange', 200]).stepReset();
-        stmt.bind([3, 'kiwi', 350]).stepReset();
-        stmt.bind([4, 'cherry', 400]).stepReset();
-        stmt.bind([5, 'banana', 320]).stepReset();
-        stmt.bind([6, 'grape', 550]).stepReset();
-        stmt.finalize();
+      const stmt = db.prepare("insert into fruits values(?, ?, ?)");
+      stmt.bind([1, 'apple', 150]).stepReset();
+      stmt.bind([2, 'orange', 200]).stepReset();
+      stmt.bind([3, 'kiwi', 350]).stepReset();
+      /*
+      stmt.bind([4, 'cherry', 400]).stepReset();
+      stmt.bind([5, 'banana', 320]).stepReset();
+      stmt.bind([6, 'grape', 550]).stepReset();
+      */
+      stmt.finalize();
 
-        const resultRows = [];
-        db.exec({
-          sql: "SELECT * FROM fruits",//実行するSQL
-          rowMode: "object",//コールバックの最初の引数のタイプを指定します,
-          //'array'(デフォルト), 'object', 'stmt'現在のStmtをコールバックに渡します
-          resultRows,//returnValue:
-        });
+      const resultRows = [];
+      db.exec({
+        sql: "SELECT * FROM fruits",//実行するSQL
+        rowMode: "object",//コールバックの最初の引数のタイプを指定します,
+        //'array'(デフォルト), 'object', 'stmt'現在のStmtをコールバックに渡します
+        resultRows,//returnValue:
+      });
+      log("ref....._insert...Result rows:", JSON.stringify(resultRows, undefined, 2));
+    
+      var e = _insert(4,'lemon',1000);
+      log("1...._insert...Result rows:", JSON.stringify(e, undefined, 2)); 
+
+
+      e = _delete(4);
+      log("2...._delete...Result rows:", JSON.stringify(e, undefined, 2));   
+
+      var asc =_sort("asc");
+      log("3..._sort to asc Result rows:",JSON.stringify(asc,undefined,2)); 
+
+      var desc = _sort("desc");
+      log("4..._sort to desc to Result rows:",JSON.stringify(desc,undefined,2));
+        
+
+
+
+    };
+
+
+    const runTests = function(sqlite3){
+      const capi = sqlite3.capi,
+            oo = sqlite3.oo1,
+            wasm = sqlite3.wasm;
+      log("Loaded module:",capi.sqlite3_libversion(), capi.sqlite3_sourceid());
+      T.assert( 0 !== capi.sqlite3_vfs_find(null) );
+      if(!capi.sqlite3_vfs_find('kvvfs')){
+        error("This build is not kvvfs-capable.");
+        return;
+      }
       
-     
-      _insert(10,'lemon',1000);
-      /*  
-      exec()
-        指定された文字列内のすべての SQL ステートメントを実行します。 引数は次のいずれかである必要があります。
-        
-        (sql, optionsObject)又は(optionsObject)
-        後者の場合、SQLを含める必要があります 実行します。デフォルトではこのオブジェクトを返しますが、
-        これは、以下で説明するオプション。それ エラーをスローします。optionsObject.sqlreturnValue
-        
-        SQL が指定されていない場合、または文字列以外の値が指定されている場合は、 例外がトリガーされます。
-        一方、空のSQLは 単にノーオペ。
-        オプションの options オブジェクトには、次のいずれかを含めることができます。 プロパティ：
-        
-        sql:実行するSQL(提供されていない場合) 最初の引数として)。
-        
-        bind:Stmt.bind() の引数として有効な単一の値。
-        これは、バインド可能なSQLの最初の空でないステートメントにのみ適用されます パラメーター。
-        (空のステートメントは完全にスキップされます。
-        
-        saveSql: オプションの配列。設定されている場合、実行されるそれぞれのSQLは ステートメントは、ステートメントが実行される前にこの配列に追加されます (しかし、それが準備された後-私たちは後まで文字列を持っていません それ)。空の SQL ステートメントは省略されます。
-        
-        戻り値:この関数の内容を指定する文字列です 戻る必要があります:
-        
-        デフォルト値は、DBオブジェクト自体が )を返す必要があります。"this"
-        "resultRows"の値を返すことを意味しますオプション。が設定されていない場合、この関数は次のように動作します 空の配列に設定されました。resultRowsresultRows
-        "saveSql"の値を返すことを意味しますオプション。が設定されていない場合、この関数は次のように動作します。 空の配列。saveSqlsaveSql
-        次のオプションは、最初のステートメントにのみ適用されます。 結果列数がゼロ以外の場合、 このステートメントは、実際には結果行を生成します。
-        
-        コールバック:の各行に対して呼び出される関数 結果セット(下記参照)ですが、そのステートメントに 結果行。コールバックはオプションオブジェクトです。 この関数は、次の目的でそのようなオブジェクトを合成する可能性があることに注意してください。 オプションを正規化します (クライアントが渡したオブジェクトではない可能性があります で)。コールバックに渡される 2 番目の引数は、常に 現在のStmtオブジェクト、呼び出し元がフェッチしたい場合に必要 列名など(フェッチすることもできることに注意してください) 経由、クライアントがオプションを提供する場合)。
-        ACHTUNG: コールバックは Stmt オブジェクトを変更してはなりません。天職 バリアントのいずれか、、または 同様に、合法ですが、カリンゴリス じゃない。このコンテキストで無効なメンバーメソッドがトリガーされます 例外です。rowModethisthis.columnNamescolumnNamesStmt.get()Stmt.getColumnName()step()finalize()
-        
-        columnNames: これが配列の場合、結果の列名 set は、コールバック (存在する場合) の前にこの配列に格納されます トリガー (クエリが結果を生成するかどうかに関係なく) 行)。結果列を持つステートメントがない場合、この値は 変更。Achtung:SQLの結果には、 同じ名前。
-        
-        resultRows:これが配列の場合、オプション:結果セットの各行(存在する場合)、 「STMT」が合法ではないという例外。使用することは合法です ボットハンド、しかし可能性が高いです 小さなデータセットに使いやすく、 WebWorkerスタイルのメッセージインターフェイスは、ifisが設定され、 'stmt'をスローします。callbackrowModeresultRowscallbackresultRowsexec()resultRowsrowMode
-        
-        コールバックに渡される最初の引数は、デフォルトで次の配列になります。 現在の結果行の値ですが、次のように変更できます。
-        
-        rowMode: コールバックの最初の引数のタイプを指定します。 それは次のいずれかかもしれません...
-        
-        渡す引数の種類を記述する文字列 コールバックの最初の引数として:
-        'array'(デフォルト) は、次の結果を引き起こします。 に渡されるおよび/または追加される。stmt.get([])callbackresultRows
-        'object'の結果がに渡されますおよび/または追加されます。 Achtung:SQLの結果には、同一の複数の列が含まれる場合があります 名。その場合、右端の列が1セットになります このオブジェクトで!stmt.get(Object.create(null))callbackresultRows
-        'stmt'現在のStmtをコールバックに渡します。 しかし、このモードは、次の場合に例外をトリガーします 配列にステートメントを追加すると、 まったく役に立たない。resultRows
-        結果の 0 から始まる列を示す整数 漕ぐ。その単一の値のみが渡されます。
-        最小長が 2 で先頭文字が ':' の文字列。 '$'、または '@'は行をオブジェクトとしてフェッチし、その1つのフィールドを抽出し、 そのフィールドの値をコールバックに渡します。これらのキーに注意してください は大文字と小文字が区別されるため、 .SQL。例えば、アオフウィルと 動作しますが、しません。結果にない列への参照 set は最初の行で例外をトリガします (チェックは 行がフェッチされるまで実行されます)。また、それは合法です JSの識別子文字なので、引用符で囲む必要はありません。
-        (デザインノート:これらの3つのキャラクターは、 文字はバインドされたパラメーターの名前付けをサポートします)。"select a A from t"rowMode'$A''$a'$
-        その他の値を指定すると、例外がトリガーされます。rowMode
-        */
-        
-        
-      
-      
-      
-      
-      
-
-        // Logs { id, name }[]
-        console.log(resultRows);
-        //log(resultRows); 
-      log("6...Result rows:", JSON.stringify(resultRows, undefined, 2)); 
-      
-     
-        db.exec({
-          sql: "SELECT * FROM fruits order by name asc",//昇順でソートしてみます。
-          rowMode: "object",
-          resultRows,
-        });
-        log("7...Result rows:", JSON.stringify(resultRows, undefined, 2)); 
-      
-        db.exec({
-          sql: "SELECT * FROM fruits order by name desc",//降順でソートしてみます。
-          rowMode: "object",
-          resultRows,
-        });
-        log("8...Result rows:",JSON.stringify(resultRows,undefined,20)); 
-         
-     
-
-
-        //複数のカラムを対象に並び替えを行う
-        //address カラムの値でソートした上で address カラムの値が同じデータに対して old カラムの値でソートします。
-        //ORDER BY句の後に記述する順番に気を付けて下さい。
-        //SELECT * FROM fruits order by address asc, old asc;
-
-
-
-
-    }
+      const dbStorage = 0 ? 'session' : 'local';
+      const theStore = 's'===dbStorage[0] ? sessionStorage : localStorage;
+      const db = new oo.JsStorageDb( dbStorage );
+      // Or: oo.DB(dbStorage, 'c', 'kvvfs')
+      log("db.storageSize():",db.storageSize());
+  
+      /*
+      document.querySelector('#btn-clear-storage').addEventListener('click',function(){
+        const sz = db.clearStorage();
+        log("kvvfs",db.filename+"Storage cleared:",sz,"entries.");
+      });
+      document.querySelector('#btn-clear-log').addEventListener('click',function(){
+        eOutput.innerText = '';
+      });
+      document.querySelector('#btn-init-db').addEventListener('click',function(){
+        try{
+          const saveSql = [];
+          db.exec({
+            sql: ["drop table if exists t;",
+                  "create table if not exists t(a);",
+                  "insert into t(a) values(?),(?),(?)"],
+            bind: [performance.now() >> 0,
+                   (performance.now() * 2) >> 0,
+                   (performance.now() / 2) >> 0],
+            saveSql
+          });
+          console.log("saveSql =",saveSql,theStore);
+          log("DB (re)initialized.");
+          log("DB が (再) 初期化されました。");
+        }catch(e){
+          error(e.message);
+        }
+      });
+      const btnSelect = document.querySelector('#btn-select1');
+      btnSelect.addEventListener('click',function(){
+        log("DB rows:");
+        try{
+          db.exec({
+            sql: "select * from t order by a",
+            rowMode: 0,
+            callback: (v)=>log(v)
+          });
+        }catch(e){
+          error(e.message);
+        }
+      });
+      document.querySelector('#btn-storage-size').addEventListener('click',function(){
+        log("size.storageSize(",dbStorage,") says", db.storageSize(),
+            "bytes");
+      });
+      */
+      log("Storage backend:",db.filename);
+      if(0===db.selectValue('select count(*) from sqlite_master')){
+        log("DB is empty. Use the init button to populate it.");
+        log("DB が空です。(Re)init db ボタンを使用して入力します。");
+      }else{
+        log("DB contains data from a previous session. Use the Clear Ctorage button to delete it.");
+        log("DBには、前のセッションのデータが含まれています。[Clear storage]ボタンを使用して削除します.");
+        //btnSelect.click();
+      }
+    };
   //const sqlite3 = await window.sqlite3InitModule();
 
   //const { DB } = sqlite3.oo1;
@@ -240,7 +279,8 @@ function _delete(name) {
     //console.log('sqlite3 =',sqlite3);
     log("2...Done initializing. Running demo...初期化完了");
     try {
-      demo1(sqlite3);//実行メソッド
+      runTests(sqlite3);
+      //demo1(sqlite3);//実行メソッド
     }catch(e){
       error("Exception:例外エラー",e.message);
     }
