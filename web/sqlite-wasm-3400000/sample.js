@@ -64,8 +64,32 @@ function _sort(asc){
 
 (function () {
   const T = self.SqliteTestUtil;
+  const toss = function(...args){throw new Error(args.join(' '))};
+  const debug = console.debug.bind(console);
+  const eOutput = document.querySelector('#test-output');
+  const logC = console.log.bind(console)
+  const logE = function(domElement){
+    eOutput.append(domElement);
+  };
+  const logHtml = function(cssClass,...args){
+    const ln = document.createElement('div');
+    if(cssClass) ln.classList.add(cssClass);
+    ln.append(document.createTextNode(args.join(' ')));
+    logE(ln);
+  }
+  const log = function(...args){
+    logC(...args);
+    logHtml('',...args);
+  };
+  const warn = function(...args){
+    logHtml('warning',...args);
+  };
+  const error = function(...args){
+    logHtml('error',...args);
+  };
+  /*
     let logHtml;
-    if(self.window === self /* UI thread */){
+    if(self.window === self ){
         console.log("Running demo from main UI thread.");
         logHtml = function(cssClass,...args){
         const ln = document.createElement('div');
@@ -73,7 +97,7 @@ function _sort(asc){
         ln.append(document.createTextNode(args.join(' ')));
         document.body.append(ln);
         };
-    }else{ /* Worker thread */
+    }else{ 
         console.log("Running demo from Worker thread.");
         logHtml = function(cssClass,...args){
         postMessage({
@@ -85,7 +109,7 @@ function _sort(asc){
     const log = (...args)=>logHtml('',...args);
     const warn = (...args)=>logHtml('warning',...args);
     const error = (...args)=>logHtml('error',...args);
-
+    */
 
     const demo1 = function(sqlite3){
       const capi = sqlite3.capi/*C-style API*/,
@@ -162,7 +186,7 @@ function _sort(asc){
       // Or: oo.DB(dbStorage, 'c', 'kvvfs')
       log("db.storageSize():",db.storageSize());
   
-      /*
+      
       document.querySelector('#btn-clear-storage').addEventListener('click',function(){
         const sz = db.clearStorage();
         log("kvvfs",db.filename+"Storage cleared:",sz,"entries.");
@@ -206,7 +230,30 @@ function _sort(asc){
         log("size.storageSize(",dbStorage,") says", db.storageSize(),
             "bytes");
       });
+      
+
+      db.exec("CREATE TABLE IF NOT EXISTS fruits(id INTEGER, name TEXT, price INTEGER)");
+
+      const stmt = db.prepare("insert into fruits values(?, ?, ?)");
+      stmt.bind([1, 'apple', 150]).stepReset();
+      stmt.bind([2, 'orange', 200]).stepReset();
+      stmt.bind([3, 'kiwi', 350]).stepReset();
+      /*
+      stmt.bind([4, 'cherry', 400]).stepReset();
+      stmt.bind([5, 'banana', 320]).stepReset();
+      stmt.bind([6, 'grape', 550]).stepReset();
       */
+      stmt.finalize();
+
+      const resultRows = [];
+      db.exec({
+        sql: "SELECT * FROM fruits",//実行するSQL
+        rowMode: "object",//コールバックの最初の引数のタイプを指定します,
+        //'array'(デフォルト), 'object', 'stmt'現在のStmtをコールバックに渡します
+        resultRows,//returnValue:
+      });
+      log("ref....._insert...Result rows:", JSON.stringify(resultRows, undefined, 2));
+    
       log("Storage backend:",db.filename);
       if(0===db.selectValue('select count(*) from sqlite_master')){
         log("DB is empty. Use the init button to populate it.");
@@ -214,7 +261,7 @@ function _sort(asc){
       }else{
         log("DB contains data from a previous session. Use the Clear Ctorage button to delete it.");
         log("DBには、前のセッションのデータが含まれています。[Clear storage]ボタンを使用して削除します.");
-        //btnSelect.click();
+        btnSelect.click();
       }
     };
   //const sqlite3 = await window.sqlite3InitModule();
@@ -247,8 +294,8 @@ function _sort(asc){
 
 
 
-  log("1...Loading and initializing sqlite3 module...");
-  if(self.window!==self) /*worker thread*/{
+  //log("1...Loading and initializing sqlite3 module...");
+  //if(self.window!==self) /*worker thread*/{
     /*
       If sqlite3.js is in a directory other than this script, in order
       to get sqlite3.js to resolve sqlite3.wasm properly, we have to
@@ -263,31 +310,39 @@ function _sort(asc){
       are simply lost, and such scripts see the self.location of
       _this_ script.
     */
-    let sqlite3Js = 'sqlite3.js';
-    const urlParams = new URL(self.location.href).searchParams;
-    if(urlParams.has('sqlite3.dir')){
-      sqlite3Js = urlParams.get('sqlite3.dir') + '/' + sqlite3Js;
-    }
-    importScripts(sqlite3Js);
-  }
-  self.sqlite3InitModule({
+    //let sqlite3Js = 'sqlite3.js';
+    //const urlParams = new URL(self.location.href).searchParams;
+    //if(urlParams.has('sqlite3.dir')){
+    //  sqlite3Js = urlParams.get('sqlite3.dir') + '/' + sqlite3Js;
+    //}
+    //importScripts(sqlite3Js);
+  //}
+
+
+
+
+  //self.sqlite3InitModule({
     // We can redirect any stdout/stderr from the module
     // like so...
-    print: log,
-    printErr: error
-  }).then(function(sqlite3){
+    //print: log,
+    //printErr: error
+  //}).then(function(sqlite3){
     //console.log('sqlite3 =',sqlite3);
-    log("2...Done initializing. Running demo...初期化完了");
-    try {
-      runTests(sqlite3);
+    //log("2...Done initializing. Running demo...初期化完了");
+    //try {
+    //  runTests(sqlite3);
       //demo1(sqlite3);//実行メソッド
-    }catch(e){
-      error("Exception:例外エラー",e.message);
-    }
+   // }catch(e){
+    //  error("Exception:例外エラー",e.message);
+    //}
+    
+
+  //});
+
+  sqlite3InitModule(self.sqlite3TestModule).then((sqlite3)=>{
+    runTests(sqlite3);
   });
 
 
-}
-
-)();
+})();
 
