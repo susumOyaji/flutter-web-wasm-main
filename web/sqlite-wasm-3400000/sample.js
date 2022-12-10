@@ -218,7 +218,7 @@ function _sort(asc){
         log("DB rows:");
         try{
           db.exec({
-            sql: "select * from t order by a",
+            sql: "select * from  fruits order by id",
             rowMode: 0,
             callback: (v)=>log(v)
           });
