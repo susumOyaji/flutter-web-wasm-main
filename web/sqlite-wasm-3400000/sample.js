@@ -168,7 +168,11 @@ function _sort(asc){
 
     };
 
-
+    
+    
+    
+    
+    //////////////////////////////
     const runTests = function(sqlite3){
       const capi = sqlite3.capi,
             oo = sqlite3.oo1,
@@ -180,51 +184,99 @@ function _sort(asc){
         return;
       }
       
+     
+
       const dbStorage = 0 ? 'session' : 'local';
       const theStore = 's'===dbStorage[0] ? sessionStorage : localStorage;
       const db = new oo.JsStorageDb( dbStorage );
       // Or: oo.DB(dbStorage, 'c', 'kvvfs')
       log("db.storageSize():",db.storageSize());
-  
+
+      //db.exec("CREATE TABLE IF NOT EXISTS fruits(id INTEGER, name TEXT, price INTEGER)");
+      //const stmt = db.prepare("insert into fruits values(?, ?, ?)");
+      //stmt.bind([1, 'apple', 150]).stepReset();
+      //stmt.bind([2, 'orange', 200]).stepReset();
+      //stmt.bind([3, 'kiwi', 350]).stepReset();
+      /*
+      stmt.bind([4, 'cherry', 400]).stepReset();
+      stmt.bind([5, 'banana', 320]).stepReset();
+      stmt.bind([6, 'grape', 550]).stepReset();
+      */
+      //stmt.finalize();
+
       
+
+
+
+  
+      document.querySelector('#btn-clear-log').addEventListener('click',function(){
+        eOutput.innerText = '';
+      });
       document.querySelector('#btn-clear-storage').addEventListener('click',function(){
         const sz = db.clearStorage();
         log("kvvfs",db.filename+"Storage cleared:",sz,"entries.");
       });
-      document.querySelector('#btn-clear-log').addEventListener('click',function(){
-        eOutput.innerText = '';
-      });
+      
       document.querySelector('#btn-init-db').addEventListener('click',function(){
         try{
+          
           const saveSql = [];
+          /*
           db.exec({
-            sql: ["drop table if exists t;",
-                  "create table if not exists t(a);",
-                  "insert into t(a) values(?),(?),(?)"],
+            sql: ["create table if not exists fruits('id');",
+                "insert into fruits(id) values(?),(?),(?)"],
             bind: [performance.now() >> 0,
-                   (performance.now() * 2) >> 0,
-                   (performance.now() / 2) >> 0],
-            saveSql
+              (performance.now() * 2) >> 0,
+              (performance.now() / 2) >> 0],
+          saveSql
           });
-          console.log("saveSql =",saveSql,theStore);
+          */
+          
+          db.exec("CREATE TABLE IF NOT EXISTS fruits(id INTEGER, name TEXT, price INTEGER)");
+          const stmt = db.prepare("insert into fruits values(?, ?, ?)");
+          stmt.bind([1, 'apple', 150]).stepReset();
+          stmt.bind([2, 'orange', 200]).stepReset();
+          stmt.bind([3, 'kiwi', 350]).stepReset();
+          stmt.finalize();
+          
+
+          //console.log("saveSql =",saveSql,theStore);
           log("DB (re)initialized.");
           log("DB が (再) 初期化されました。");
         }catch(e){
           error(e.message);
         }
       });
-      const btnSelect = document.querySelector('#btn-select1');
+      const btnSelect = document.querySelector('#btn-sort-db-rows-order');
       btnSelect.addEventListener('click',function(){
-        log("DB rows:");
+        log("DB rows:Asc");
         try{
           db.exec({
-            sql: "select * from  fruits order by id",
-            rowMode: 0,
+            sql: "select * from  fruits order by id asc",
+            rowMode: 1,
             callback: (v)=>log(v)
           });
         }catch(e){
           error(e.message);
         }
+      });
+
+      const btnSelectAsc = document.querySelector('#btn-sort-db-rows-asc');
+      btnSelectAsc.addEventListener('click',function(){
+        log("DB rows:Desc");
+        //try{
+          var desc =_sort("desc");
+          log("..._sort to desc to Result rows:",JSON.stringify(desc,undefined,2));
+          /*
+          db.exec({
+            sql: "select * from  fruits order by id desc",
+            rowMode: 2,
+            callback: (v)=>log(v)
+          });
+          */
+        //}catch(e){
+        //  error(e.message);
+        //}
       });
       document.querySelector('#btn-storage-size').addEventListener('click',function(){
         log("size.storageSize(",dbStorage,") says", db.storageSize(),
@@ -232,18 +284,9 @@ function _sort(asc){
       });
       
 
-      db.exec("CREATE TABLE IF NOT EXISTS fruits(id INTEGER, name TEXT, price INTEGER)");
+      //db.exec("CREATE TABLE IF NOT EXISTS fruits(id INTEGER, name TEXT, price INTEGER)");
 
-      const stmt = db.prepare("insert into fruits values(?, ?, ?)");
-      stmt.bind([1, 'apple', 150]).stepReset();
-      stmt.bind([2, 'orange', 200]).stepReset();
-      stmt.bind([3, 'kiwi', 350]).stepReset();
-      /*
-      stmt.bind([4, 'cherry', 400]).stepReset();
-      stmt.bind([5, 'banana', 320]).stepReset();
-      stmt.bind([6, 'grape', 550]).stepReset();
-      */
-      stmt.finalize();
+     
 
       const resultRows = [];
       db.exec({
