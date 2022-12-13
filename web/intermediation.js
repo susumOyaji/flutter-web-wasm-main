@@ -297,8 +297,8 @@ function jsInit(msg) {
   //});
 
   sqlite3InitModule(self.sqlite3TestModule).then((sqlite3)=>{
-    runTests(sqlite3);
-    //demo1(sqlite3);//実行メソッド
+    //runTests(sqlite3);
+    demo1(sqlite3);//実行メソッド
   });
 
 

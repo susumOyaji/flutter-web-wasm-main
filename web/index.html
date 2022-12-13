@@ -39,7 +39,11 @@
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
 </head>
-<body>   
+<body> 
+  <script src="sqlite-wasm-3400000/jswasm/sqlite3.js"></script>
+  <script src="sqlite-wasm-3400000/common/SqliteTestUtil.js"></script>
+  <script src="intermediation.js"></script>
+  
   <script>
     window.addEventListener('load', function(ev) {
       // Download main.dart.js
@@ -54,9 +58,7 @@
       });
     });
   </script>
-  <h1>sqlite3 demo</h1>
-    <script src="sqlite-wasm-3400000/jswasm/sqlite3.js"></script>
-    <script src="sqlite-wasm-3400000/main.js"></script>
+  
       
 </body>
 </html>

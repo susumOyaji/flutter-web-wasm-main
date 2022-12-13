@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+    <link rel="stylesheet" href="common/emscripten.css"/>
+    <link rel="stylesheet" href="common/testing.css"/>
+    <title>Hello, sqlite3</title>
+  </head>
+  <body>
+    <h1>SQLite WASM</h1>
+    <header id='titlebar'><span>sqlite3-kvvfs.js tests</span></header>
+    <!-- emscripten bits -->
+    <figure id="module-spinner">
+      <div class="spinner"></div>
+      <div class='center'><strong>Initializing app...</strong></div>
+      <div class='center'>
+        On a slow internet connection this may take a moment.  If this
+        message displays for "a long time", intialization may have
+        failed and the JavaScript console may contain clues as to why.
+      </div>
+    </figure>
+    <div class="emscripten" id="module-status">Downloading...</div>
+    <div class="emscripten">
+      <progress value="0" max="100" id="module-progress" hidden='1'></progress>  
+    </div><!-- /emscripten bits -->
+    <fieldset>
+      <legend>Options</legend>
+      <div class='toolbarFirst'>
+        <button id='btn-clear-log'>Clear Display</button>
+        <button id='btn-clear-storage'>Clear storage</button>
+        <button id='btn-storage-size'>Approx. storage size</button>
+      </div>
+      <div class='toolbarSecond'>
+        
+        <button id='btn-init-db'>(Re)init db(Add to Data</button>
+        <button id='btn-sort-db-rows-order'>Sort db rows Asc</button>
+        <button id='btn-sort-db-rows-asc'>Sort db rows Desc</button>
+        
+      </div>
+    </fieldset>
+    <div id='test-output'></div>
+    <style>
+      .toolbar {
+          display: flex;
+      }
+      .toolbar > * { margin: 0.25em; }
+      fieldset { border-radius: 0.5em; }
+    </style>
+    <script src="sqlite-wasm-3400000/jswasm/sqlite3.js"></script>
+    <script src="sqlite-wasm-3400000/common/SqliteTestUtil.js"></script>
+   
+    <script src="intermediation.js"></script>
+  </body>
+</html>
