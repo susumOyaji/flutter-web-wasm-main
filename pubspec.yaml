@@ -12,7 +12,7 @@ dependencies:
   wasm_interop: ^2.0.1
   sqlite3: ^1.9.1
   http: ^0.13.5
-  
+  js: ^0.6.5
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -23,3 +23,4 @@ flutter:
   assets:
     - assets/wasm/
     - web/sqlite-wasm-3400000/jswasm/
+    - test.html

@@ -38,13 +38,13 @@
   </script>
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
-</head>
-<body> 
+  <!-- This Line is  adds  Sqlite-wasm initialization JS code -->
   <script src="sqlite-wasm-3400000/jswasm/sqlite3.js"></script>
   <script src="sqlite-wasm-3400000/common/SqliteTestUtil.js"></script>
   <script src="intermediation.js"></script>
-  
-  <script>
+</head>
+<body> 
+ <script>
     window.addEventListener('load', function(ev) {
       // Download main.dart.js
       _flutter.loader.loadEntrypoint({
@@ -58,7 +58,7 @@
       });
     });
   </script>
-  
+   
       
 </body>
 </html>
