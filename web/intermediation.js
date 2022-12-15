@@ -1,7 +1,11 @@
+//'use strict'; を追加することで未定義の変数の使用を禁止するなど、
+//より厳格な文法でプログラムを書くことができますので、基本的にはファイルの記載することが推奨されます
+
 'use strict';
+
 var winObj;
 var db;
-
+var re;
 
 function _insert(_id,_name,_price) {
   const resultRows = [];
@@ -91,17 +95,18 @@ function jsTestFunction(msg){
     
       // Logs { id, name }[]
       console.log(resultRows);
-     
+      return resultRows;
     })();
     
 }
 
 // JavaScript
-printOptions({responsive: true});
+//printOptions({responsive: true});
 
 
 window.state = {
-  hello: 'resultRows'
+  hello: 'resultRows',
+  word: 123
 }
 
 

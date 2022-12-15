@@ -1,68 +1,42 @@
-@JS()
-library stringify;//文字列化
+//@JS()
+//library stringify;//文字列化
 //library callable_function;
 
 import 'package:flutter/material.dart';
-import 'package:js/js.dart';
-
-
+//import 'package:js/js.dart';
+import 'dart:js' as js;
 
 //最初の行では、JSで定義された関数をDartに紹介します。
 //次の行では、Dartから呼び出すことができる関数を定義し、この関数を呼び出すと、
 //JSの他の関数が呼び出されます
-@JS('showMyPopup') //exactly what we defined in JS
-external void showPopup(String message);
+//@JS('showMyPopup') //exactly what we defined in JS
+//external void showPopup(String message);
 
-@JS('okClicked')
-external set _okClicked(void Function() f);
+//@JS('okClicked')
+//external set _okClicked(void Function() f);
 
-@JS('cancelClicked')
-external set _cancelClicked(void Function() f);
-
-void cancelClicked() {
-  myState.setState(() {
-    toShow = "Cancel";
-  });
-}
-
-void okClicked() {
-  myState.setState(() {
-    toShow = "OK";
-  });
-}
-
-
-
-
+//@JS('cancelClicked')
+//external set _cancelClicked(void Function() f);
 
 //import 'package:flutter/material.dart';
 //import 'dart:js' as js;
 //import 'package:webview_flutter/webview_flutter.dart'
 //import 'package:js/js.dart';
 
-
-
 /// Allows assigning a function to be callable from `window.functionName()`
-@JS('functionName')
-external set _functionName(void Function() f);
+//@JS('functionName')
+//external set _functionName(void Function() f);
 
 /// Allows calling the assigned function from Dart as well.
-@JS()
-external void functionName();
+//@JS()
+//external void functionName();
 
 void _someDartFunction() {
   print('Hello from Dart!');
 }
 
-
-
-
-
-
 void main() {
-  _okClicked = allowInterop(() => okClicked());
-  _cancelClicked = allowInterop(() => cancelClicked());
-   _functionName = allowInterop(_someDartFunction);
+  // _functionName = allowInterop(_someDartFunction);
   // JavaScript code may now call `functionName()` or `window.functionName()`.
   runApp(const MyApp());
 }
@@ -121,12 +95,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void scriptInit() {
     var state = js.JsObject.fromBrowserObject(js.context['state']);
-    print(state['hello']);
-    var ret =
+    print(state['word']);
+    
+    dynamic obj =
         js.context.callMethod('jsTestFunction', ['DartからJavascriptを呼び出しました！']);
+  
+    
 
-    print("scriptInit-state: $state");
-    print("scriptInit: $ret");
+    print("scriptInit-state: $obj");
+    //print("scriptInit: $ret");
     //js.context.callMethod('jsInit', ['DartからJavascriptを呼び出しました！']);
     //js.context.callMethod('logger', ['_someFlutterState']);
   }
